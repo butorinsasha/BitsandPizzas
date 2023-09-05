@@ -4,15 +4,9 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        />
-
-    <item
         android:id="@+id/action_create_order"
         android:title="@string/create_order_title"
+        android:icon="@drawable/ic_add_white_24dp"
         android:orderInCategory="1"
         android:showAsAction="ifRoom"
         />
@@ -20,7 +14,14 @@
     <item android:id="@+id/action_share"
         android:title="@string/action_share"
         android:orderInCategory="2"
-        android:showAsAction="ifRoom"
+        android:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
         />
 
 </menu>
