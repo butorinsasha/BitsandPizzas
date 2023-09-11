@@ -28,7 +28,8 @@
         <activity
             android:name=".OrderActivity"
             android:exported="false"
-            android:label="@string/create_order_title">
+            android:label="@string/create_order_title"
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
