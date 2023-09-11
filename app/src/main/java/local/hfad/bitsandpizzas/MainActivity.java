@@ -8,8 +8,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.widget.ShareActionProvider;
 
 public class MainActivity extends Activity {
+
+    private ShareActionProvider shareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +24,24 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+        shareActionProvider = (ShareActionProvider) menuItem.getActionProvider();
+        setIntent("This is example text");
         return super.onCreateOptionsMenu(menu);
+    }
+
+        private void setIntent(String text) {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT, text);
+            shareActionProvider.setShareIntent(intent);
+        }
+
+        private void share(String text) {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT, text);
+            startActivity(intent);
     }
 
     @Override
@@ -33,6 +53,8 @@ public class MainActivity extends Activity {
                 startActivity(intent);
                 return true;
             case R.id.action_share:
+                share("This is example text");
+                return true;
             case R.id.action_settings:
                 Toast.makeText(this, menuItem.getTitle() + " selected", LENGTH_SHORT).show();
                 return true;
