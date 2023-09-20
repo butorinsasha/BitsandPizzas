@@ -23,57 +23,85 @@ public class MainActivity extends Activity {
 
     private ShareActionProvider shareActionProvider;
     private String[] titles;
-    private ListView drawerList;
+    private ListView drawerListView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
 
 
-    //Listener for drawer list items
+    // Implementation of Listener for drawer list items
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        public void onItemClick(AdapterView<?> parentListView,  //  The view which item was clicked (in this case, the list view)
+                                View itemView,                  //  The item which is clicked in parentListView
+                                int position,                   // The position of the item which is clicked if parentListView
+                                long id) {                      //  (?) don't know the difference between position and id
             selectItem(position);
         }
     }
 
 
-    // MainActivity overridden methods
+    // android.app.Activity OVERRIDDEN METHODS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        titles = getResources().getStringArray(R.array.titles);
-        drawerList = (ListView) findViewById(R.id.drawer);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        drawerList.setAdapter(new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_activated_1,
-                titles
+
+
+
+        // INITIALIZE the drawer's list by string-array of titles
+        titles = getResources().getStringArray(R.array.titles);
+
+
+
+        // INITIALIZE MainActivity field - drawer -  by findViewById()
+        drawerListView = (ListView) findViewById(R.id.drawer);
+
+        // Use ArrayAdapter(
+        //      android.content.Context   context
+        //      @LayoutRes                int resource,
+        //      T[]                       objects
+        //    )
+        // to papulate the ListView
+        drawerListView.setAdapter(new ArrayAdapter<>(          // setAdapter for drawer
+                this,                                          // MainActivity context
+                android.R.layout.simple_list_item_activated_1, // Using simple_list_item_activiated_1 means that the item the user clicks on is highlighted
+                titles                                         // string-array of titles
         ));
 
-        drawerList.setOnItemClickListener(new DrawerItemClickListener());
+        // Use an OnItemClickListener to respond to clicks in the list view
+        // (see the implementation of DrawerItemClickListener above in MainActivity)
+        drawerListView.setOnItemClickListener(new DrawerItemClickListener());
 
-        if (savedInstanceState == null) {
-            selectItem(0);
-        }
 
-        //Creating ActionBarDrawerToggle
+
+
+        // INITIALIZE MainActivity field - drawerLayout -  by findViewById()
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+
+
+
+
+        // INITIALIZE MainActivity field -  actionBarDrawerToggle
+        // The best way of setting up a DrawerListener is to use an ActionBarDrawerToggle. An ActionBarDrawerToggle
+        // is a special type of DrawerListener that works with an action
+        // bar. It allows you to listen for DrawerLayout events like a normal DrawerListener, and it also lets you open and close the drawer by clicking on an icon on the action bar.
         actionBarDrawerToggle = new ActionBarDrawerToggle(
-                this,
-                drawerLayout,
-                R.string.open_drawer,
-                R.string.close_drawer
+                this,                   // android.app.Activity activity,
+                drawerLayout,           // android.support.v4.widget.DrawerLayout drawerLayout
+                R.string.open_drawer,   // @StringRes int openDrawerContentDescRes // Add these to strings.xml. These are needed for accessibility
+                R.string.close_drawer   // @StringRes int closeDrawerContentDescRe // Add these to strings.xml. These are needed for accessibility
         ) {
 
-            //Called when a drawer has settled in a completely open state.
+            // Called when a drawer has settled in a completely open state.
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 invalidateOptionsMenu();
             }
 
-            //Called when a drawer has settles in a completely closed state
+            // Called when a drawer has settles in a completely closed state
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
@@ -81,9 +109,15 @@ public class MainActivity extends Activity {
             }
         };
 
+        // If the MainActivity is newly created, use the selectItem() method to display TopFragment.
+        // (?) Seems like everything works well without this code
+        if (savedInstanceState == null) {
+            selectItem(0);
+        }
+
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
 
-        //Enable the Up (Back) button so you can use it for the drawer
+        // Enable the Up (Back) button so you can use it for the drawer
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
 
@@ -109,53 +143,69 @@ public class MainActivity extends Activity {
 
 
 
-                                       // Additional private MainActivity methods
-    private void selectItem(int position) {
-        Fragment fragment;
-        switch(position) {
-            case 1:
-                fragment = new PizzaFragment();
-                break;
-            case 2:
-                fragment = new PastaFragment();
-                break;
-            case 3:
-                fragment = new StoresFragment();
-                break;
-            default:
-                fragment = new TopFragment();
+
+
+        // ADDITIONAL MainActivity METHODS
+
+        // What happens when item was clicked.
+        // This method is used in DrawerItemClickListener.onItemClick()
+        private void selectItem(int position) {
+            // Defined which fragment to show drawerListView
+            Fragment fragment;
+            switch(position) {
+                case 1:
+                    fragment = new PizzaFragment();
+                    break;
+                case 2:
+                    fragment = new PastaFragment();
+                    break;
+                case 3:
+                    fragment = new StoresFragment();
+                    break;
+                default:                                // (?) don't know when this executes
+                    fragment = new TopFragment();
+            }
+
+            // Show certain fragment
+            // (!) This typical code for fragment to be shown
+            FragmentTransaction fragmentTransaction = getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.content_frame, fragment)
+                    .addToBackStack(null)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                    fragmentTransaction.commit();
+
+            // Change the title by calling the setActionTitle() method,
+            // passing the position of the item that was clicked on
+            // (see additional MainActivity.setActionBarTitle() implementation below)
+            setActionBarTitle(position);
+
+            // Close the drawer. This saves the user from closing it themselves.
+            drawerLayout.closeDrawer(drawerListView);
         }
-        FragmentTransaction fragmentTransaction = getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content_frame, fragment)
-                .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                fragmentTransaction.commit();
 
-        setActionBarTitle(position);
-
-        drawerLayout.closeDrawer(drawerList);
-
-    }
-
-    private void setActionBarTitle(int position) {
-        String title;
-        if (position == 0) {
-            title = getResources().getString(R.string.app_name);
-        } else {
-            title = titles[position];
-        }
-        getActionBar().setTitle(title);
-    }
+            // Setting ActionBar title using MainActivity.getActionBar()
+            // and ActionBar.setTitle(CharSequence charSequence)
+            private void setActionBarTitle(int position) {
+                String title;
+                if (position == 0) {
+                    title = getResources().getString(R.string.app_name); // If the user clicks on the “Home” option, use the app name for the title.
+                } else {
+                    title = titles[position]; // Otherwise, get the String from the titles array for the position that was clicked and wse that
+                }
+                getActionBar().setTitle(title); // Display the title in the action bar.
+            }
 
 
 
 
-    // Action bar overridden methods
+
+    // ACTION BAR OVERRIDDEN android.app.Activity METHODS
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the drawer is open, hide action items related to the content view
-        boolean isDrawerOpened = drawerLayout.isDrawerOpen(drawerList);
+        boolean isDrawerOpened = drawerLayout.isDrawerOpen(drawerListView);
         menu.findItem(R.id.action_share).setVisible(!isDrawerOpened);
         return super.onPrepareOptionsMenu(menu);
     }
@@ -170,6 +220,8 @@ public class MainActivity extends Activity {
         return super.onCreateOptionsMenu(menu);
     }
 
+
+        // Additional ActionBar methods
         private void setIntent(String text) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
@@ -193,7 +245,6 @@ public class MainActivity extends Activity {
             // and the rest of the code in the activity’s onOptionsItemSelected() method will run.
             return true;
         }
-
         switch(menuItem.getItemId()) {
             case R.id.action_create_order:
                 Toast.makeText(this, menuItem.getTitle() + " selected", LENGTH_SHORT).show();
