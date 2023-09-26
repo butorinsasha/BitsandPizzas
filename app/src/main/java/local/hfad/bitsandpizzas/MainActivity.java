@@ -4,6 +4,7 @@ import static android.widget.Toast.LENGTH_SHORT;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -26,6 +27,7 @@ public class MainActivity extends Activity {
     private ListView drawerListView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
+    private int currentPosition = 0;
 
 
     // Implementation of Listener for drawer list items
@@ -82,11 +84,23 @@ public class MainActivity extends Activity {
 
 
 
+        // If the MainActivity is newly created, use the selectItem() method to display TopFragment.
+        // (?) Seems like everything works well without this code
+        if (savedInstanceState != null) {
+            currentPosition = savedInstanceState.getInt("position");
+            setActionBarTitle(currentPosition);
+        } else {
+            selectItem(0);
+        }
+
+
+
 
         // INITIALIZE MainActivity field -  actionBarDrawerToggle
-        // The best way of setting up a DrawerListener is to use an ActionBarDrawerToggle. An ActionBarDrawerToggle
-        // is a special type of DrawerListener that works with an action
-        // bar. It allows you to listen for DrawerLayout events like a normal DrawerListener, and it also lets you open and close the drawer by clicking on an icon on the action bar.
+        // The best way of setting up a DrawerListener is to use an ActionBarDrawerToggle.
+        // An ActionBarDrawerToggle is a special type of DrawerListener that works with an action bar.
+        // It allows you to listen for DrawerLayout events like a normal DrawerListener,
+        //  and it also lets you open and close the drawer by clicking on an icon on the action bar.
         actionBarDrawerToggle = new ActionBarDrawerToggle(
                 this,                   // android.app.Activity activity,
                 drawerLayout,           // android.support.v4.widget.DrawerLayout drawerLayout
@@ -98,6 +112,7 @@ public class MainActivity extends Activity {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerClosed(drawerView);
+                // When you call the invalidateOptionsMenu() method, the activity’s onPrepareOptionsMenu() method gets called. You can override this method to specify how the menu items need to change.
                 invalidateOptionsMenu();
             }
 
@@ -105,23 +120,105 @@ public class MainActivity extends Activity {
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
+                // When you call the invalidateOptionsMenu() method, the activity’s onPrepareOptionsMenu() method gets called. You can override this method to specify how the menu items need to change.
                 invalidateOptionsMenu();
             }
         };
 
-        // If the MainActivity is newly created, use the selectItem() method to display TopFragment.
-        // (?) Seems like everything works well without this code
-        if (savedInstanceState == null) {
-            selectItem(0);
-        }
 
+
+
+        // Set actionBarDrawerToggle to drawerLayout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
-
         // Enable the Up (Back) button so you can use it for the drawer
+        // https://developer.android.com/reference/android/app/ActionBar#setHomeButtonEnabled(boolean)
+        //  Setting the DISPLAY_HOME_AS_UP display option will automatically enable the home button.
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        //getActionBar().setHomeButtonEnabled(true);
+
+        getFragmentManager().addOnBackStackChangedListener(
+                new FragmentManager.OnBackStackChangedListener() {
+                    @Override
+                    public void onBackStackChanged() {
+                        Fragment fragment = getFragmentManager().findFragmentByTag("visible_fragment");
+
+                        if (fragment instanceof TopFragment) {
+                            currentPosition = 0;
+                        }
+                        if (fragment instanceof PizzaFragment) {
+                            currentPosition = 1;
+                        }
+                        if (fragment instanceof PastaFragment) {
+                            currentPosition = 2;
+                        }
+                        if (fragment instanceof StoresFragment) {
+                            currentPosition = 3;
+                        }
+                        setActionBarTitle(currentPosition);
+                        drawerListView.setItemChecked(currentPosition, true);
+                    }
+                }
+        );
 
     }
+
+
+
+
+            // ADDITIONAL MainActivity METHODS
+
+            // What happens when item was clicked.
+            // This method is used in DrawerItemClickListener.onItemClick()
+            private void selectItem(int position) {
+                currentPosition = position;
+                // Defined which fragment to show drawerListView
+                Fragment fragment;
+                switch(position) {
+                    case 1:
+                        fragment = new PizzaFragment();
+                        break;
+                    case 2:
+                        fragment = new PastaFragment();
+                        break;
+                    case 3:
+                        fragment = new StoresFragment();
+                        break;
+                    default:                                // (?) don't know when this executes
+                        fragment = new TopFragment();
+                }
+
+                // Show certain fragment
+                // (!) This typical code for fragment to be shown
+                FragmentTransaction fragmentTransaction = getFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.content_frame, fragment, "visible_fragment")
+                        .addToBackStack(null)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                fragmentTransaction.commit();
+
+                // Change the title by calling the setActionTitle() method,
+                // passing the position of the item that was clicked on
+                // (see additional MainActivity.setActionBarTitle() implementation below)
+                setActionBarTitle(position);
+
+                // Close the drawer. This saves the user from closing it themselves.
+                drawerLayout.closeDrawer(drawerListView);
+            }
+
+
+
+            // Setting ActionBar title using MainActivity.getActionBar()
+            // and ActionBar.setTitle(CharSequence charSequence)
+            private void setActionBarTitle(int position) {
+                String title;
+                if (position == 0) {
+                    title = getResources().getString(R.string.app_name); // If the user clicks on the “Home” option, use the app name for the title.
+                } else {
+                    title = titles[position]; // Otherwise, get the String from the titles array for the position that was clicked and wse that
+                }
+                getActionBar().setTitle(title); // Display the title in the action bar.
+            }
+
 
     // Sync the toggle state after onRestoreInstanceState has occurred.
     // You need to add this method to yout activity so that the state of the ActionBarDrawerToggle
@@ -141,62 +238,11 @@ public class MainActivity extends Activity {
         actionBarDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-
-
-
-
-        // ADDITIONAL MainActivity METHODS
-
-        // What happens when item was clicked.
-        // This method is used in DrawerItemClickListener.onItemClick()
-        private void selectItem(int position) {
-            // Defined which fragment to show drawerListView
-            Fragment fragment;
-            switch(position) {
-                case 1:
-                    fragment = new PizzaFragment();
-                    break;
-                case 2:
-                    fragment = new PastaFragment();
-                    break;
-                case 3:
-                    fragment = new StoresFragment();
-                    break;
-                default:                                // (?) don't know when this executes
-                    fragment = new TopFragment();
-            }
-
-            // Show certain fragment
-            // (!) This typical code for fragment to be shown
-            FragmentTransaction fragmentTransaction = getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.content_frame, fragment)
-                    .addToBackStack(null)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                    fragmentTransaction.commit();
-
-            // Change the title by calling the setActionTitle() method,
-            // passing the position of the item that was clicked on
-            // (see additional MainActivity.setActionBarTitle() implementation below)
-            setActionBarTitle(position);
-
-            // Close the drawer. This saves the user from closing it themselves.
-            drawerLayout.closeDrawer(drawerListView);
-        }
-
-            // Setting ActionBar title using MainActivity.getActionBar()
-            // and ActionBar.setTitle(CharSequence charSequence)
-            private void setActionBarTitle(int position) {
-                String title;
-                if (position == 0) {
-                    title = getResources().getString(R.string.app_name); // If the user clicks on the “Home” option, use the app name for the title.
-                } else {
-                    title = titles[position]; // Otherwise, get the String from the titles array for the position that was clicked and wse that
-                }
-                getActionBar().setTitle(title); // Display the title in the action bar.
-            }
-
-
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        bundle.putInt("position", currentPosition);
+    }
 
 
 
