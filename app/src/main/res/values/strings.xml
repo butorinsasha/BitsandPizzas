@@ -29,4 +29,5 @@
 
     <string name="open_drawer">Open drawer</string>
     <string name="close_drawer">Close drawer</string>
+    <string name="info_image_content_description">Image</string>
 </resources>
