@@ -33,10 +33,10 @@ public class MainActivity extends Activity {
     // Implementation of Listener for drawer list items
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
-        public void onItemClick(AdapterView<?> parentListView,  //  The view which item was clicked (in this case, the list view)
-                                View itemView,                  //  The item which is clicked in parentListView
+        public void onItemClick(AdapterView<?> parentListView,  // The view which item was clicked (in this case, the list view)
+                                View itemView,                  // The item which is clicked in parentListView
                                 int position,                   // The position of the item which is clicked if parentListView
-                                long id) {                      //  (?) don't know the difference between position and id
+                                long id) {                      // (?)->(+) don't know the difference between position and id - The position is the position of the view inside the parent. For your case (a ListView) it means the index of the row. (Starting at 0) For ArrayAdapter and SimpleAdapter id is the same as position. For a CursorAdapter, id is the row id of the table.
             selectItem(position);
         }
     }
@@ -100,10 +100,10 @@ public class MainActivity extends Activity {
         // The best way of setting up a DrawerListener is to use an ActionBarDrawerToggle.
         // An ActionBarDrawerToggle is a special type of DrawerListener that works with an action bar.
         // It allows you to listen for DrawerLayout events like a normal DrawerListener,
-        //  and it also lets you open and close the drawer by clicking on an icon on the action bar.
+        // and it also lets you open and close the drawer by clicking on an icon on the action bar.
         actionBarDrawerToggle = new ActionBarDrawerToggle(
-                this,                   // android.app.Activity activity,
-                drawerLayout,           // android.support.v4.widget.DrawerLayout drawerLayout
+                this,  // android.app.Activity activity,
+                drawerLayout,    // android.support.v4.widget.DrawerLayout drawerLayout
                 R.string.open_drawer,   // @StringRes int openDrawerContentDescRes // Add these to strings.xml. These are needed for accessibility
                 R.string.close_drawer   // @StringRes int closeDrawerContentDescRe // Add these to strings.xml. These are needed for accessibility
         ) {
@@ -221,7 +221,7 @@ public class MainActivity extends Activity {
 
 
     // Sync the toggle state after onRestoreInstanceState has occurred.
-    // You need to add this method to yout activity so that the state of the ActionBarDrawerToggle
+    // You need to add this method to your activity so that the state of the ActionBarDrawerToggle
     // is in sync with the state of the drawer
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
