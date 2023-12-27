@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
             // Called when a drawer has settled in a completely open state.
             @Override
             public void onDrawerOpened(View drawerView) {
-                super.onDrawerClosed(drawerView);
+                super.onDrawerOpened(drawerView);
                 // When you call the invalidateOptionsMenu() method, the activity’s onPrepareOptionsMenu() method gets called. You can override this method to specify how the menu items need to change.
                 invalidateOptionsMenu();
             }
