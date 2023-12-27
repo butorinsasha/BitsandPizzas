@@ -1,11 +1,8 @@
 package local.hfad.bitsandpizzas;
 
 import static android.widget.Toast.LENGTH_SHORT;
+import static androidx.core.view.MenuItemCompat.getActionProvider;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -15,13 +12,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.ShareActionProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private ShareActionProvider shareActionProvider;
     private String[] titles;
@@ -58,7 +59,7 @@ public class MainActivity extends Activity {
 
 
         // INITIALIZE MainActivity field - drawer -  by findViewById()
-        drawerListView = (ListView) findViewById(R.id.drawer);
+        drawerListView = findViewById(R.id.drawer);
 
         // Use ArrayAdapter(
         //      android.content.Context   context
@@ -80,7 +81,7 @@ public class MainActivity extends Activity {
 
 
         // INITIALIZE MainActivity field - drawerLayout -  by findViewById()
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
 
 
 
@@ -127,26 +128,24 @@ public class MainActivity extends Activity {
         };
 
 
-
-
         // Set actionBarDrawerToggle to drawerLayout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         // Enable the Up (Back) button so you can use it for the drawer
         // https://developer.android.com/reference/android/app/ActionBar#setHomeButtonEnabled(boolean)
         //  Setting the DISPLAY_HOME_AS_UP display option will automatically enable the home button.
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        //getActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
-        getFragmentManager().addOnBackStackChangedListener(
+        getSupportFragmentManager().addOnBackStackChangedListener(
                 new FragmentManager.OnBackStackChangedListener() {
                     @Override
                     public void onBackStackChanged() {
-                        Fragment fragment = getFragmentManager().findFragmentByTag("visible_fragment");
+                        Fragment fragment = getSupportFragmentManager().findFragmentByTag("visible_fragment");
 
                         if (fragment instanceof TopFragment) {
                             currentPosition = 0;
                         }
-                        if (fragment instanceof PizzaFragment) {
+                        if (fragment instanceof PizzaMaterialFragment) {
                             currentPosition = 1;
                         }
                         if (fragment instanceof PastaFragment) {
@@ -176,7 +175,7 @@ public class MainActivity extends Activity {
                 Fragment fragment;
                 switch(position) {
                     case 1:
-                        fragment = new PizzaFragment();
+                        fragment = new PizzaMaterialFragment();
                         break;
                     case 2:
                         fragment = new PastaFragment();
@@ -190,7 +189,7 @@ public class MainActivity extends Activity {
 
                 // Show certain fragment
                 // (!) This typical code for fragment to be shown
-                FragmentTransaction fragmentTransaction = getFragmentManager()
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.content_frame, fragment, "visible_fragment")
                         .addToBackStack(null)
@@ -217,7 +216,8 @@ public class MainActivity extends Activity {
                 } else {
                     title = titles[position]; // Otherwise, get the String from the titles array for the position that was clicked and wse that
                 }
-                getActionBar().setTitle(title); // Display the title in the action bar.
+
+                getSupportActionBar().setTitle(title); // Display the title in the action bar.
             }
 
 
@@ -262,7 +262,7 @@ public class MainActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem menuItem = menu.findItem(R.id.action_share);
-        shareActionProvider = (ShareActionProvider) menuItem.getActionProvider();
+        shareActionProvider = (ShareActionProvider) getActionProvider(menuItem);
         setIntent("This is example text");
         return super.onCreateOptionsMenu(menu);
     }

@@ -12,30 +12,31 @@ import androidx.recyclerview.widget.RecyclerView;
 
 class CaptionedImagesAdapter extends RecyclerView.Adapter<CaptionedImagesAdapter.ViewHolder> {
 
-    private String[] captions;
-    private int[] imageIds;
+    private final String[] captions;
+    private final int[] imageIds;
 
     public CaptionedImagesAdapter(String[] captions, int[] imageIds) {
         this.captions = captions;
         this.imageIds = imageIds;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private CardView cardView;
-        public ViewHolder(CardView v) {
-            super(v);
-            cardView = v;
-        }
-    }
-
     @NonNull
     @Override // Create a new view
     public CaptionedImagesAdapter.ViewHolder onCreateViewHolder(
-            @NonNull ViewGroup parent, // the recycler view itself
+            @NonNull ViewGroup parent, // the RecyclerView itself
             int viewType) {
         CardView cv = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_captioned_image, parent, false);
         return new ViewHolder(cv);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final CardView cardView;
+
+        public ViewHolder(CardView cv) {
+            super(cv);
+            cardView = cv;
+        }
     }
 
     @Override // Set the values inside the given view
