@@ -6,8 +6,19 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:text="@string/title_top"
+        android:id="@+id/welcome_text"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:text="@string/welcome_text" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pizza_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/welcome_text"
+        android:layout_marginTop="10dp"
+        android:scrollbars="vertical">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 </RelativeLayout>
